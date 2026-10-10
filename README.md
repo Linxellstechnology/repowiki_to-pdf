@@ -1,19 +1,41 @@
 # REPOWIKI TO PDF
 
-![Version](https://img.shields.io/badge/version-0.1.8-7C6BF5?style=flat-square)
-[![Platform](https://img.shields.io/badge/platform-Windows-0067B8?style=flat-square)](#quick-start)
-[![License](https://img.shields.io/badge/license-MIT-1d1d1f?style=flat-square)](LICENSE)
-[![Built with](https://img.shields.io/badge/built%20with-Electron%20%2B%20TypeScript-2b78e4?style=flat-square)](https://www.electronjs.org)
+**Qoder generates a beautiful Repo Wiki — then locks it inside the IDE. REPOWIKI TO PDF turns it into a single, vector, print-ready document your clients can actually receive.**
 
-**Turn a Qoder Repo Wiki into a single, vector, print-ready PDF — the technical documentation your clients actually open.**
+![Release](https://img.shields.io/badge/release-v0.1.8-green)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-0078d7)
+![License](https://img.shields.io/badge/license-MIT-1d1d1f)
+![UI languages](https://img.shields.io/badge/UI-EN%20%2F%20%E4%B8%AD%E6%96%87-7c6bf5)
+![Downloads](https://img.shields.io/github/downloads/Linxellstechnology/repowiki_to-pdf/total)
 
-You generate the wiki in Qoder. We typeset it: a cover, a clickable table of contents, native PDF bookmarks, Mermaid diagrams as real vectors, working internal links — A4 or Letter, ready to print or deliver.
+<!-- DEMO:GIF
+──────────────────────────────────────────────────────────────────────────────
+Demo slot. When the GIF is ready:
+  1. Record the full flow in the app — Load Wiki Folder → Check → Options →
+     Build PDF → Open The File (OBS Studio or Win+G; ~1280×800, under 10 MB).
+  2. Save it as assets/demo.gif and commit.
+  3. Replace the screenshot table below with:
+       ![REPOWIKI TO PDF — demo](assets/demo.gif)
+Until then the committed screenshots serve as the fallback demo.
+────────────────────────────────────────────────────────────────────────────── -->
 
-![REPOWIKI TO PDF — English UI](assets/screenshots/ui-en.png)
+<table>
+  <tr>
+    <td align="center"><strong>English</strong></td>
+    <td align="center"><strong>中文</strong></td>
+  </tr>
+  <tr>
+    <td><img src="assets/screenshots/ui-en.png" alt="REPOWIKI TO PDF — English UI" width="440"></td>
+    <td><img src="assets/screenshots/ui-zh.png" alt="REPOWIKI TO PDF — 中文 UI" width="440"></td>
+  </tr>
+</table>
 
-The app ships with a full **中文 interface** as well — switch instantly from the header:
+## Why
 
-![REPOWIKI TO PDF — 中文 UI](assets/screenshots/ui-zh.png)
+- **Vector, not screenshots.** Selectable, searchable text and crisp SVG diagrams at any zoom — a PDF your client can actually read, not a printout of pixels.
+- **One file, not a folder of Markdown.** The whole wiki — cover, contents, every page — typeset into a single document you can attach to an email or deliver to a client.
+- **Bookmarks and links survive.** Native PDF outline, clickable table of contents, working internal cross-links — everything Qoder shows you in the IDE still works on paper.
+- **Print-ready.** A4 or Letter, per-section page breaks, footer page numbers and staple-safe margins, ready for the printer or the client's inbox.
 
 ## Features
 
@@ -28,25 +50,25 @@ The app ships with a full **中文 interface** as well — switch instantly from
 
 ## Quick start (from source)
 
-**Prerequisites:** Windows x64, [Node.js](https://nodejs.org/) ≥ 20 and npm (workspaces). End users need nothing — just the installer.
+**Prerequisites:** Windows 10/11 x64, [Node.js](https://nodejs.org/) ≥ 20 and npm (workspaces). End users need nothing — just the installer.
 
 ```bash
 npm install                                  # core + theme + app workspaces
 
 npm run dev   -w @repowiki-pdf/app           # Vite renderer + Electron, hot reload
-npm run start -w @repowiki-pdf/app            # build Electron main, run it directly
+npm run start -w @repowiki-pdf/app           # build Electron main, run it directly
 
 npm test                                     # core unit tests (Vitest)
 npm run typecheck                            # tsc across the monorepo
 npm run lint                                 # Biome
 
-npm run test:window    -w @repowiki-pdf/app   # real-window smoke gate
+npm run test:window    -w @repowiki-pdf/app  # real-window smoke gate
 npm run test:integration -w @repowiki-pdf/app # fixture → PDF structural assertions
 
-npm run dist -w @repowiki-pdf/app             # electron-builder → release/ (NSIS + portable)
+npm run dist -w @repowiki-pdf/app            # electron-builder → release/ (NSIS + portable)
 ```
 
-> Installers are not published here (GitHub file-size limits): grab `repowiki-to-pdf Setup 0.1.8.exe` / `repowiki-to-pdf Portable 0.1.8.exe` from the release distribution channel.
+> Installers are not published in the repo tree (GitHub file-size limits): grab `repowiki-to-pdf Setup 0.1.8.exe` / `repowiki-to-pdf Portable 0.1.8.exe` from the GitHub Releases page.
 
 ## How to use
 
@@ -84,6 +106,10 @@ The build never fails on a single local problem — it degrades gracefully and t
 
 A small TypeScript monorepo: a pure **core** (no Electron), a **theme** package, and the Electron **app** (main / preload / renderer). Full pipeline and IPC contract: [ARCHITECTURE.md](ARCHITECTURE.md). Architectural decisions are recorded as Architecture Decision Records, available on request.
 
+## Roadmap
+
+The roadmap is public. See the pinned **Roadmap issue** in [GitHub Issues](https://github.com/Linxellstechnology/repowiki_to-pdf/issues) — feedback and `good first issue` picks are welcome.
+
 ## Credits
 
 Developed by **Hello Dati** — [contact@hellodati.com](mailto:contact@hellodati.com) — By **Nizar HAMDI**.
@@ -91,3 +117,7 @@ Developed by **Hello Dati** — [contact@hellodati.com](mailto:contact@hellodati
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+---
+
+⭐ If this saves your team a broken PDF, a star helps others find it.
