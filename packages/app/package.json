@@ -1,6 +1,6 @@
 {
   "name": "@repowiki-pdf/app",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": true,
   "description": "Convert a Qoder RepoWiki into a single vector print-ready A4 PDF.",
   "author": "LinXells",

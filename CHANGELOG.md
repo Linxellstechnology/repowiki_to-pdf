@@ -4,6 +4,17 @@ All notable changes to this project are documented in this file. The format
 follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9] - 2026-10-10
+
+### Fixed
+
+- erDiagram attributes with multi-word types (`enum identity_status status`) and space-separated constraint keys (`uuid property_id PK FK`) are now auto-adapted on export instead of falling back to the code block.
+- sequenceDiagram actors named `Activate` (reserved-word collision) are now renamed even when glued to the left of an arrow (`Activate->>DB`).
+
+### Internal
+
+- Mermaid repair engine: two new validated erDiagram rules (R7, R8) and a rename-boundary bug fix in rule R1 (it silently skipped identifiers immediately followed by an arrow, producing partial renames).
+
 ## [0.1.8] - 2026-10-25
 
 ### Added
