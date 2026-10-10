@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+    "noEmit": false,
+    "declaration": false,
+    "outDir": "dist-electron",
+    "rootDir": "."
+  },
+  "include": [
+    "electron/**/*.ts",
+    "electron/**/*.mts",
+    "integration/**/*.ts",
+    "src/ipc.ts"
+  ],
+  "references": [
+    { "path": "../core/tsconfig.build.json" },
+    { "path": "../theme/tsconfig.build.json" }
+  ]
+}

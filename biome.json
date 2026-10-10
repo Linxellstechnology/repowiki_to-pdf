@@ -1,0 +1,23 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.0/schema.json",
+  "files": {
+    "ignore": [
+      "node_modules",
+      "**/dist",
+      "**/out",
+      "**/release",
+      "**/dist-electron",
+      "**/dist-renderer",
+      "**/*.tsbuildinfo"
+    ]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  }
+}

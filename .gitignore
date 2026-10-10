@@ -1,0 +1,16 @@
+node_modules/
+dist/
+dist-electron/
+dist-renderer/
+out/
+*.tsbuildinfo
+release/
+*.pdf
+# Dossiers internes (pré-publication 0.1.8) : ADR/CHANGELOG/plans/specs et
+# contenu fixture régénéré — jamais dans l'arbre public.
+internal/
+fixtures/
+.qoder/temp/
+
+# images brutes de génération (logo)
+vibe_images/

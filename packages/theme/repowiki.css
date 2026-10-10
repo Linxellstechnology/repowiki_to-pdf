@@ -1,0 +1,232 @@
+/*
+ * repowiki.css — thème RepoWiki (palette GitHub-like, alignée sur le rendu Qoder).
+ * Offline : les tokens highlight.js sont embarqués ici (aucun import CDN).
+ * La pagination A4 est dans print-a4.css.
+ */
+
+/* Base typographique (composeur : <body>, sections .wiki-page) */
+body {
+  font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+  color: #1f2328;
+  line-height: 1.6;
+}
+
+/* Titres : hiérarchie + ancres markdown-it (levels 1-4) */
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 1.5em 0 0.6em;
+}
+h2 {
+  font-size: 1.5em;
+}
+h3 {
+  font-size: 1.25em;
+}
+h4 {
+  font-size: 1em;
+}
+
+/* En-tête de section du wiki (composeur : <h1 class="page-title">) */
+.page-title {
+  border-bottom: 1px solid #d1d9e0;
+  padding-bottom: 0.3em;
+  font-size: 2em;
+  margin-top: 0;
+}
+
+/* Contenu courant : liens, paragraphes, listes (markdown-it) */
+p {
+  margin: 0 0 1em;
+}
+a {
+  color: #0969da;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+ul,
+ol {
+  padding-left: 2em;
+  margin: 0 0 1em;
+}
+
+/* Code : blocs + inline (préfixe .hljs posé par highlight.js/markdown-it) */
+pre,
+code {
+  background: #f6f8fa;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    monospace;
+  font-size: 0.9em;
+}
+pre {
+  padding: 16px;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  margin: 0 0 1em;
+}
+code {
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+}
+pre code {
+  padding: 0;
+  background: transparent;
+}
+
+/* Tokens highlight.js (thème clair GitHub, embarqué offline) */
+.hljs-keyword,
+.hljs-doctag,
+.hljs-literal {
+  color: #cf222e;
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition {
+  color: #0a3069;
+}
+.hljs-comment,
+.hljs-quote {
+  color: #6e7781;
+  font-style: italic;
+}
+.hljs-number {
+  color: #0550ae;
+}
+.hljs-title,
+.hljs-function,
+.hljs-title.function_ {
+  color: #8250df;
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-selector {
+  color: #0550ae;
+}
+.hljs-built_in,
+.hljs-type {
+  color: #953800;
+}
+.hljs-deletion {
+  color: #cf222e;
+}
+
+/* Tableaux (markdown-it) */
+table {
+  border-collapse: collapse;
+  display: block;
+  overflow: auto;
+  margin: 0 0 1em;
+}
+th,
+td {
+  border: 1px solid #d1d9e0;
+  padding: 6px 13px;
+}
+th {
+  background: #f6f8fa;
+  font-weight: 600;
+}
+tr:nth-child(2n) td {
+  background: #f6f8fa;
+}
+
+/* Citation (markdown-it) */
+blockquote {
+  border-left: 0.25em solid #d1d9e0;
+  color: #656d76;
+  padding: 0 1em;
+  margin: 0 0 1em;
+}
+
+/* Blocs Mermaid (Task 6/12) */
+.mermaid-block {
+  text-align: center;
+  margin: 1em 0;
+}
+.mermaid svg {
+  max-width: 100%;
+}
+.mermaid-fallback {
+  border: 1px solid #d29922;
+  background: #fff8c5;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: left;
+}
+.mermaid-fallback pre {
+  margin: 0.5em 0 0;
+}
+
+/* Image manquante (Task 7 links.ts) + page indisponible (Task 8 compose.ts) */
+.img-missing {
+  color: #a40e26;
+}
+
+/* Marqueur de section §§<id>§§ : présent pour pdfjs (Task 9) mais invisible */
+.sec-marker {
+  color: transparent;
+  font-size: 1px;
+  user-select: none;
+}
+
+/* Section du wiki : l'espacement vertical (la rupture de page est gérée en print-a4.css) */
+.wiki-page {
+  margin: 0;
+}
+
+/* Page de garde (compose.ts : <section class="cover">) */
+.cover {
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.5em;
+}
+.cover h1 {
+  font-size: 2.5em;
+  margin: 0;
+}
+.cover-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #656d76;
+  font-size: 0.9em;
+  margin: 0;
+}
+.cover-meta {
+  color: #656d76;
+  margin: 0;
+}
+
+/* Table des matières (compose.ts : <section class="toc-page">) */
+.toc-page {
+  margin: 0;
+}
+.toc-list {
+  list-style: none;
+  padding-left: 0;
+}
+.toc-list a {
+  text-decoration: none;
+  color: #0969da;
+}
+.toc-list a:hover {
+  text-decoration: underline;
+}
+.toc-l1 {
+  padding-left: 0;
+}
+.toc-l2 {
+  padding-left: 1.4em;
+}
+.toc-l3 {
+  padding-left: 2.8em;
+}

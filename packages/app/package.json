@@ -1,0 +1,35 @@
+{
+  "name": "@repowiki-pdf/app",
+  "version": "0.1.8",
+  "private": true,
+  "description": "Convert a Qoder RepoWiki into a single vector print-ready A4 PDF.",
+  "author": "LinXells",
+  "type": "module",
+  "main": "dist-electron/electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build:electron": "node -e \"require('node:fs').rmSync('dist-electron/electron/preload.js',{force:true})\" && tsc -b tsconfig.electron.json",
+    "build:renderer": "vite build",
+    "build": "npm run build:electron && npm run build:renderer",
+    "start": "npm run build:electron && electron .",
+    "dist": "electron-builder --win --config electron-builder.yml",
+    "test:window": "npm run build && electron . --smoke-window",
+    "test:integration": "npm run build:electron && electron integration/integration-run.mjs && node integration/assert.mjs"
+  },
+  "dependencies": {
+    "@repowiki-pdf/core": "*",
+    "@repowiki-pdf/theme": "*",
+    "mermaid": "^12.1.0",
+    "pdf-lib": "^1.17.1",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0",
+    "vite": "^5.4.0"
+  }
+}

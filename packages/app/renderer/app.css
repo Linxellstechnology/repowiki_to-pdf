@@ -1,0 +1,708 @@
+/* Charte 0.1.5 — glassmorphism minimaliste (référence : control center iOS).
+   Palette dérivée de l'icône : dégradé indigo profond → violet (la tuile de
+   l'icône), accent violet #7C6BF5, verre blanc translucide. Layout 2
+   colonnes équilibré (cartes étirées à hauteur alignée) ; sous 900 px les
+   colonnes s'empilent. Contrastes pensés WCAG (texte blanc sur fond sombre,
+   texte indigo foncé sur boutons blancs). */
+
+:root {
+  font-family: system-ui, -apple-system, "Segoe UI Variable", "Segoe UI",
+    sans-serif;
+
+  /* Tokens issus de l'icône (échantillonnage du dégradé de la tuile). */
+  --accent: #7c6bf5; /* violet central de la tuile */
+  --accent-strong: #9d8bff; /* survol / focus */
+  --accent-ink: #241a63; /* texte sur bouton blanc (contraste AA+) */
+  --ink: #f4f3ff; /* texte principal (blanc légèrement lavande) */
+  --ink-muted: rgba(244, 243, 255, 0.72);
+  --glass: rgba(255, 255, 255, 0.1);
+  --glass-strong: rgba(255, 255, 255, 0.14);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --radius: 20px;
+  --shadow: 0 18px 44px rgba(8, 6, 40, 0.45), inset 0 1px 0
+    rgba(255, 255, 255, 0.18);
+  --ok: #6ee7a0;
+  --ok-ink: #d9ffe9;
+  --danger: #ff8a8a;
+  color: var(--ink);
+}
+
+/* Fond : dégradé indigo→violet de la tuile + halos radiaux « control
+   center » pour que le blur des cartes ait de la matière à flouter. */
+html,
+body {
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(
+      52rem 52rem at 12% -8%,
+      rgba(124, 107, 245, 0.5),
+      transparent 60%
+    ),
+    radial-gradient(
+      44rem 44rem at 108% 104%,
+      rgba(157, 123, 255, 0.42),
+      transparent 62%
+    ), linear-gradient(150deg, #171a4f 0%, #2c2a86 48%, #5b3fc4 100%);
+  background-attachment: fixed;
+}
+
+.app {
+  max-width: 1280px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+/* Branding uppercase (owner) : h1 = « REPOWIKI TO PDF ». L'en-tête porte
+   aussi le sélecteur de langue, à droite. */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1.75rem;
+}
+
+h1 {
+  font-size: 1.15rem;
+  font-weight: 650;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--ink);
+}
+
+/* Sélecteur de langue (verre, pastilles) : EN | 中文 — l'active est pleine
+   blanche (même langage visuel que button.primary). fieldset = sémantique
+   de groupe (lint a11y), styles UA neutralisés. */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0.25rem 0.75rem;
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(8, 6, 40, 0.25);
+  flex: none;
+}
+
+.lang-btn {
+  padding: 0.15rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.lang-btn:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.lang-btn.lang-active {
+  background: #ffffff;
+  color: var(--accent-ink);
+}
+
+.lang-sep {
+  color: rgba(244, 243, 255, 0.35);
+  user-select: none;
+}
+
+/* Grille 2 colonnes équilibrée : stretch aligne les hauteurs de colonne,
+   la carte preview (flex colonne) occupe toute la hauteur disponible. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(360px, 480px) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.col-config {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.col-preview {
+  min-width: 0;
+  position: sticky;
+  top: 1.25rem;
+  display: flex;
+}
+
+/* Carte « verre givré » : blanc translucide + blur/saturate, liseré
+   interne clair, coins 20 px, ombre douce. */
+.card {
+  flex: 1;
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.4rem 1.5rem;
+}
+
+.card h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.9rem;
+}
+
+/* Pastille d'étape : verre plus soutenu, chiffre accentué. */
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 50%;
+  background: rgba(124, 107, 245, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex: none;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  margin: 0.65rem 0;
+}
+
+fieldset.row {
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 0.45rem 0.8rem;
+}
+
+.row label,
+.row legend {
+  font-weight: 600;
+}
+
+input[type="text"],
+input:not([type]),
+select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--ink);
+  min-width: 0;
+  flex: 1 1 12rem;
+}
+
+input::placeholder {
+  color: rgba(244, 243, 255, 0.45);
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+select option {
+  color: #171a4f;
+}
+
+/* Boutons : primaire = plein blanc sur l'accent (lisibilité maximale),
+   secondaire = « ghost » verre. */
+button {
+  padding: 0.5rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s
+    ease;
+}
+
+button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+button.primary {
+  background: #ffffff;
+  border-color: transparent;
+  color: var(--accent-ink);
+  box-shadow: 0 6px 18px rgba(8, 6, 40, 0.35);
+}
+
+button.primary:hover:not(:disabled) {
+  background: #efecff;
+  border-color: transparent;
+}
+
+/* Primaire désactivé : verre dépoli, reste lisible. */
+button.primary:disabled {
+  background: rgba(255, 255, 255, 0.28);
+  color: rgba(36, 26, 99, 0.9);
+  box-shadow: none;
+}
+
+/* Badges d'état (pilules verre) : check en cours / wiki trouvé / Done /
+   Failed. La zone reste stable (aria-live) pendant les transitions. */
+.status-zone {
+  margin: 0.65rem 0 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 650;
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid transparent;
+}
+
+.badge-busy {
+  background: rgba(255, 204, 102, 0.16);
+  border-color: rgba(255, 204, 102, 0.4);
+  color: #ffd98a;
+}
+
+.badge-ok {
+  background: rgba(110, 231, 160, 0.14);
+  border-color: rgba(110, 231, 160, 0.4);
+  color: var(--ok-ink);
+}
+
+/* Pill d'état proéminent après Build PDF : Done (vert) / Failed (rouge). */
+.badge-done,
+.badge-failed {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.5rem 1.4rem;
+}
+
+.badge-done {
+  background: rgba(110, 231, 160, 0.2);
+  border-color: rgba(110, 231, 160, 0.55);
+  color: var(--ok-ink);
+  box-shadow: 0 0 22px rgba(110, 231, 160, 0.25);
+}
+
+.badge-failed {
+  background: rgba(255, 106, 106, 0.2);
+  border-color: rgba(255, 138, 138, 0.55);
+  color: #ffd2d2;
+  box-shadow: 0 0 22px rgba(255, 106, 106, 0.22);
+}
+
+.scan-summary {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.scan-summary .scan-title {
+  font-weight: 650;
+  margin-bottom: 0.1rem;
+}
+
+.scan-summary ul {
+  padding-left: 1.2rem;
+  margin: 0.4rem 0;
+}
+
+/* Progression : message principal sur une ligne + barre verre + libellé
+   de phase en dessous. */
+.progress {
+  margin-top: 0.75rem;
+}
+
+.progress-message {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+
+.progress-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  transition: width 0.25s ease;
+}
+
+/* Aperçu (carte 3) : occupe toute la hauteur de colonne (layout équilibré),
+   iframe = « page blanche posée sur le verre ». */
+.preview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.preview-banner {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  background: rgba(124, 107, 245, 0.18);
+  border: 1px solid rgba(124, 107, 245, 0.4);
+  border-radius: 12px;
+  padding: 0.35rem 0.7rem;
+  align-self: flex-start;
+}
+
+.preview-frame {
+  width: 100%;
+  flex: 1;
+  min-height: 60vh;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(8, 6, 40, 0.4);
+}
+
+/* Rapport (carte 4 · résultat). */
+.report {
+  margin-top: 0.5rem;
+}
+
+.report-path {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 0.8rem;
+  word-break: break-all;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.4rem 0.6rem;
+}
+
+.warning-groups {
+  padding-left: 1.1rem;
+}
+
+.warning-groups ul {
+  padding-left: 1.1rem;
+}
+
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Erreur : bannière rouge verre, cohérente dans toutes les cartes. */
+.error {
+  color: #ffd2d2;
+  background: rgba(255, 106, 106, 0.16);
+  border: 1px solid rgba(255, 138, 138, 0.45);
+  border-radius: 14px;
+  padding: 0.55rem 0.85rem;
+  white-space: pre-wrap;
+}
+
+/* Hint de gating (boutons/cartes verrouillés avant le check réussi). */
+.hint {
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Note informative (ex. confirmation d'impression). */
+.note {
+  color: var(--ok-ink);
+  font-size: 0.85rem;
+  margin: 0.25rem 0 0;
+}
+
+.muted {
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+}
+
+/* Modales About/Documentation (0.1.7) : voile sombre flouté + panneau
+   « smoked glass » profond centré, corps défilant (la doc est longue),
+   en-tête titre + ✕.
+
+   FIX CONTRASTE 0.1.7 — le panneau était un verre blanc translucide
+   (--glass-strong) posé sur un fond déjà sombre : il restait foncé, et
+   l'élément natif <dialog> impose color: CanvasText (noir) via la stylesheet
+   UA — hérité par p / td / th / code qui n'avaient pas de couleur explicite
+   → texte sombre sur verre sombre (capture owner). D'où : panneau rgba(18,16,
+   40,.92) opaque-ish + toutes les règles de couleurs posées sur des
+   descendants de `.modal` (portée locale, le reste de l'app inchangé). */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: rgba(8, 6, 40, 0.55);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+}
+
+.modal {
+  /* neutralise l'UA du <dialog> (absolute/inset/margin auto) : ici la
+     modale est un enfant flex du voile, centré par flexbox. */
+  position: relative;
+  margin: 0;
+  width: min(640px, 100%);
+  max-width: none;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  /* smoked-glass profond : assez opaque pour que #f4f3ff passe ≥7:1
+     quelle que te soit la matière derrière le blur. */
+  background: rgba(18, 16, 40, 0.92);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.3rem 1.5rem;
+
+  /* annule color: CanvasText de l'UA <dialog> ; tout descendant non
+     explicitement coloré hérite de cette encre claire. */
+  color: var(--ink);
+}
+
+/* Filet de sécurité : tout descendant de modale qui hériterait d'une encre
+   sombre (UA, futur composant) est reforcé en blanc lavande. Les règles plus
+   spécifiques ci-dessous (links `.modal a`, badges `.modal code`) gagnent
+   quand même (spécificité 0-1-1 > 0-1-0 du `*`). */
+.modal * {
+  color: var(--ink);
+}
+
+.modal h1,
+.modal h2,
+.modal h3,
+.modal h4,
+.modal p,
+.modal li,
+.modal td,
+.modal th,
+.modal summary,
+.modal strong,
+.modal em {
+  color: var(--ink);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  flex: none;
+}
+
+.modal-title {
+  font-size: 1.05rem;
+  font-weight: 650;
+  margin: 0;
+  color: var(--ink);
+}
+
+.modal-close {
+  flex: none;
+  /* zone tactile ✕ ≥ 20 px (ici ~28 px de haut) + encre blanche. */
+  min-height: 28px;
+  min-width: 28px;
+  padding: 0.25rem 0.7rem;
+  font-size: 1rem;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.modal-body {
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Défilement lisible sur fond sombre (Chrome/Electron, zone doc). */
+.modal-body::-webkit-scrollbar {
+  width: 10px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.28);
+  border: 2px solid rgba(18, 16, 40, 0.9);
+  border-radius: 999px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+/* About : icône de l'app (asset Vite), marque, tagline, crédits, version
+   canonique. */
+.about {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.about-icon {
+  width: 96px;
+  height: 96px;
+  border-radius: 22px;
+  box-shadow: 0 10px 28px rgba(8, 6, 40, 0.5);
+  margin-bottom: 0.5rem;
+}
+
+.about-brand {
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.about-tagline {
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem;
+}
+
+/* Description produit (0.1.8) — phrase de positionnement sous la marque. */
+.about-description {
+  margin: 0 0 0.75rem;
+  max-width: 46ch;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  text-wrap: balance;
+}
+
+.about-credits {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.about-credits a,
+.modal a {
+  /* accent clair sur panneau sombre, souligné (contraste ≥4.5:1, vérifié) */
+  color: #a5b4ff;
+  text-decoration: underline;
+}
+
+.about-version {
+  margin: 0.6rem 0 0;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 0.82rem;
+  color: #cdd6ff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  padding: 0.2rem 0.8rem;
+}
+
+/* Documentation : sections numérotées sobrement + table des codes warning. */
+.docs section {
+  margin-bottom: 1.1rem;
+}
+
+.docs h3 {
+  font-size: 0.95rem;
+  font-weight: 650;
+  margin: 0 0 0.4rem;
+  color: var(--ink);
+}
+
+.docs p,
+.docs li {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 0.25rem 0;
+}
+
+.docs ol,
+.docs ul {
+  padding-left: 1.3rem;
+  margin: 0.3rem 0;
+}
+
+.docs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin-top: 0.4rem;
+}
+
+.docs-table th,
+.docs-table td {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  vertical-align: top;
+  color: var(--ink);
+}
+
+/* Badges de code (PLAN_MISSING…) : encre indigo-claire sur verre clair
+   1 px bordé — lisibles sur le panneau sombre (contraste ≥4.5:1 vérifié). */
+.modal code {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color: #cdd6ff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+}
+
+.docs-table code {
+  font-size: 0.78rem;
+  white-space: nowrap;
+  padding: 0.1rem 0.35rem;
+}

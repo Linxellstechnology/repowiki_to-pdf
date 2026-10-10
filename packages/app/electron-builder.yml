@@ -1,0 +1,65 @@
+# electron-builder configuration for @repowiki-pdf/app (Windows).
+# Run from the app workspace (cwd = packages/app) via `npm run dist -w @repowiki-pdf/app`.
+# Paths below are resolved relative to this app directory (packages/app):
+#   ../../release         -> repo-root /release        (installer + portable output)
+#   ../../node_modules/*  -> hoisted workspace node_modules (mermaid lives here)
+
+appId: com.linxells.repowiki-to-pdf
+productName: RepoWiki to PDF
+copyright: Copyright © 2026 LinXells
+
+# Electron is hoisted to the workspace root node_modules, so electron-builder
+# cannot auto-detect it from packages/app — pin the version explicitly (the
+# binary electron-builder fetches for packaging). Keep in sync with the
+# installed electron (33.x). See electron-builder issue #3984.
+electronVersion: 33.4.11
+
+# Build outputs are produced by `npm run build` (tsc -b electron + vite renderer)
+# and the hoisted workspace deps (@repowiki-pdf/core, @repowiki-pdf/theme) are
+# collected automatically as production dependencies.
+directories:
+  output: ../../release
+  buildResources: build
+
+files:
+  - dist-electron/**/*
+  - dist-renderer/**/*
+  - package.json
+  # Runtime window/taskbar icon: BrowserWindow({ icon }) loads this path from
+  # inside the asar (electron/main.ts resolves ../../build/icon.png).
+  - build/icon.png
+
+# No native modules are used — skip the (slow, network) electron rebuild step.
+npmRebuild: false
+
+# Mermaid is rendered offline in an offscreen window. assets.ts resolves, in a
+# packaged app, `process.resourcesPath/mermaid/mermaid.min.js` — so ship the
+# single UMD bundle just outside the asar. (See packages/app/electron/assets.ts.)
+extraResources:
+  - from: ../../node_modules/mermaid/dist/mermaid.min.js
+    to: mermaid/mermaid.min.js
+
+win:
+  target:
+    - nsis
+    - portable
+  # Custom icon (1024x1024 PNG, iOS-glass tile). electron-builder converts it
+  # to the ICO set and NSIS installerIcon/uninstallerIcon INHERIT it from
+  # win.icon — do NOT pin those keys to the PNG path directly: makensis only
+  # accepts real .ico files (explicit PNG paths abort the build).
+  # NOTE: because the sign/edit step below is disabled, rcedit never runs —
+  # the EXE *file* icon stays the Electron default until an rcedit-capable
+  # (Developer Mode / admin / signing) environment is available. Window +
+  # taskbar icons come from BrowserWindow({ icon }) at runtime and the
+  # installer artwork DOES apply (makensis step, not rcedit).
+  icon: build/icon.png
+  signAndEditExecutable: false
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  artifactName: repowiki-to-pdf Setup ${version}.${ext}
+
+portable:
+  artifactName: repowiki-to-pdf Portable ${version}.${ext}

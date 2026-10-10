@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Fast unit lane: core is pure TypeScript, no Electron, so it runs on Linux.
+  unit:
+    name: Lint · typecheck · unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint (biome)
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests (core)
+        run: npm test
+
+  # Electron lane: the print/mermaid pipeline must run in a real Electron on
+  # Windows — the same platform the app ships to. Also builds the installer.
+  integration:
+    name: Integration export · Windows package
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build app (electron + renderer)
+        run: npm run build --workspace @repowiki-pdf/app
+      - name: Integration test (headless fixture export + PDF assertions)
+        run: npm run test:integration --workspace @repowiki-pdf/app
+      - name: Package Windows installer + portable
+        run: npm run dist --workspace @repowiki-pdf/app
+      - name: Upload installer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: repowiki-to-pdf-windows
+          path: |
+            release/*.exe
+            release/*.yml
+          if-no-files-found: error

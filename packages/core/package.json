@@ -1,0 +1,32 @@
+{
+  "name": "@repowiki-pdf/core",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "highlight.js": "^11.10.0",
+    "js-yaml": "^4.1.0",
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^9.2.0",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.7.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0",
+    "@repowiki-pdf/theme": "0.1.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/markdown-it": "^14.1.2"
+  }
+}
