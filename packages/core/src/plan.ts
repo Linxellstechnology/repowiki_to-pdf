@@ -215,6 +215,7 @@ export function buildToc(
     if (!file) {
       warnings.push({
         code: 'PLAN_TITLE_UNMATCHED',
+        vars: { title: d.title },
         message: `« ${d.title} » du plan ne correspond à aucun fichier.`,
       });
       continue;
@@ -231,6 +232,7 @@ export function buildToc(
       warnings.push({
         code: 'PAGE_NOT_IN_PLAN',
         page: f.name,
+        vars: { file: f.name },
         message: `« ${f.name} » ajoutée en fin de TOC (absente du plan).`,
       });
       toc.push(nodeFor(titleFromFilename(f.name), f, 1));

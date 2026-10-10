@@ -90,6 +90,54 @@ describe('rewriteLinks', () => {
       w.some((x) => x.code === 'BROKEN_LINK' && x.message.includes('10%')),
     ).toBe(true);
   });
+  // 0.1.11 : vars structurés pour l'affichage localisé (EN/中文) côté
+  // renderer. `kind` est un jeton machine ANGLAIS, jamais du français.
+  it('BROKEN_LINK vars { target, kind:"missing" } quand cible absente', () => {
+    const w: CoreWarning[] = [];
+    rewriteLinks('<a href="./Inconnu.md">z</a>', CONTENT, map, w);
+    expect(w[0]?.vars).toEqual({ target: './Inconnu.md', kind: 'missing' });
+  });
+
+  it('BROKEN_LINK vars { target, kind:"malformed" } quand % invalide', () => {
+    const w: CoreWarning[] = [];
+    rewriteLinks('<a href="./10% Something.md">x</a>', CONTENT, map, w);
+    expect(w[0]?.vars).toEqual({
+      target: './10% Something.md',
+      kind: 'malformed',
+    });
+  });
+
+  it('LINK_FRAG_DROPPED vars { frag, target, kind:"absent" }', () => {
+    const w: CoreWarning[] = [];
+    const known = new Set(['p-003--autre']);
+    rewriteLinks(
+      '<a href="./3.%20Sous-systemes/3.1%20API.md#D%C3%A9tails">y</a>',
+      CONTENT,
+      map,
+      w,
+      known,
+    );
+    expect(w[0]?.vars).toEqual({
+      frag: 'D%C3%A9tails',
+      target: './3.%20Sous-systemes/3.1%20API.md',
+      kind: 'absent',
+    });
+  });
+
+  it('LINK_FRAG_DROPPED vars kind:"malformed" quand fragment % invalide', () => {
+    const w: CoreWarning[] = [];
+    rewriteLinks(
+      '<a href="./2.%20Architecture.md#10% zz">y</a>',
+      CONTENT,
+      map,
+      w,
+    );
+    expect(w[0]?.vars).toEqual({
+      frag: '10% zz',
+      target: './2.%20Architecture.md',
+      kind: 'malformed',
+    });
+  });
 });
 
 describe('embedImages', () => {
@@ -130,5 +178,11 @@ describe('embedImages', () => {
     expect(h).not.toContain('src="./assets/logo.png"'); // aucun src relatif restant
     expect(h.match(/data:image\/png;base64/g)?.length).toBe(2);
     expect(w).toHaveLength(0);
+  });
+
+  it('IMAGE_MISSING vars { src }', async () => {
+    const w: CoreWarning[] = [];
+    await embedImages('<img src="./assets/nope.png">', CONTENT, w);
+    expect(w[0]?.vars).toEqual({ src: './assets/nope.png' });
   });
 });

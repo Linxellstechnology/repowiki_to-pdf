@@ -3,10 +3,16 @@ import path from 'node:path';
 import type { LanguageScan, ScanResult, WikiPageFile } from './types.js';
 
 export class WikiNotFoundError extends Error {
+  // 0.1.11 : code machine + jetons pour la localisation UI (le message brut
+  // reste en français, pour le diagnostic).
+  readonly code = 'WIKI_NOT_FOUND';
+  readonly vars: Record<string, string>;
+
   constructor(public projectRoot: string) {
     super(
       `Aucun RepoWiki trouvé dans ${projectRoot}. Génère le Repo Wiki dans Qoder (bouton « Generate » du panneau Repo Wiki), puis relance.`,
     );
+    this.vars = { path: projectRoot };
     this.name = 'WikiNotFoundError';
   }
 }

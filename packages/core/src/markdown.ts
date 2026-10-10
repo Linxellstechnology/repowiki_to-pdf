@@ -34,7 +34,10 @@ function highlightCode(code: string, lang: string): string {
  * `renderMermaidBlock(token.content, n)` — aucun refactor nécessaire, l'instance
  * est déjà locale à l'appel.
  */
-function createAnchoredMarkdownIt(pageId: string): MarkdownIt {
+function createAnchoredMarkdownIt(
+  pageId: string,
+  mermaidFallbackTitle?: string,
+): MarkdownIt {
   const instance = new MarkdownIt({
     html: true,
     linkify: true,
@@ -55,7 +58,11 @@ function createAnchoredMarkdownIt(pageId: string): MarkdownIt {
     const token = tokens[idx];
     if (token?.info.trim() === 'mermaid') {
       mermaidIndex += 1;
-      return renderMermaidBlock(token.content, mermaidIndex);
+      return renderMermaidBlock(
+        token.content,
+        mermaidIndex,
+        mermaidFallbackTitle,
+      );
     }
     // Tout autre langage retombe sur le renderer de fence par défaut
     // (surlignage hljs de la Task 5) — aucune régression pour `ts`, etc.
@@ -73,10 +80,11 @@ function createAnchoredMarkdownIt(pageId: string): MarkdownIt {
 export function renderPageMarkdown(
   md: string,
   pageId: string,
+  opts?: { mermaidFallbackTitle?: string },
 ): { html: string; title: string; warnings: CoreWarning[] } {
   const { data, content } = matter(md);
   const h1 = /^#\s+(.+)$/m.exec(content)?.[1]?.trim();
-  const instance = createAnchoredMarkdownIt(pageId);
+  const instance = createAnchoredMarkdownIt(pageId, opts?.mermaidFallbackTitle);
   // le h1 est porté par l'en-tête de section du document (composeur, Task 8) ;
   // `(?:\r?\n|$)` couvre les fichiers sans saut de ligne final et les fins de ligne CRLF.
   const body = instance.render(content.replace(/^#\s+.+(?:\r?\n|$)/, ''));

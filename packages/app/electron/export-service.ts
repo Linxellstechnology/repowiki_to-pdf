@@ -22,6 +22,7 @@ import {
   locateSections,
   parsePlan,
   parseWikiMeta,
+  pdfCopyFor,
   polishPdf,
   renderPageMarkdown,
   repairMermaidSource,
@@ -39,6 +40,7 @@ import { loadThemeCss } from '@repowiki-pdf/theme';
 import { BrowserWindow } from 'electron';
 import type { PrintToPDFOptions } from 'electron';
 import { PDFDocument } from 'pdf-lib';
+import { RpcError } from '../src/ipc.js';
 import type { ExportOptions, ExportResult, ProgressEvent } from '../src/ipc.js';
 import { OFFSCREEN_PAGE_URL } from './offscreen.js';
 import type { OffscreenRenderResult } from './offscreen.js';
@@ -67,12 +69,21 @@ async function prepareDocument(
   const scan = await scanProject(opts.projectRoot);
   const langScan = scan.languages.find((l) => l.language === opts.language);
   if (!langScan) {
-    throw new Error(
+    throw new RpcError(
       `Langage « ${opts.language} » absent du wiki (langues disponibles : ${scan.languages
         .map((l) => l.language)
         .join(', ')}).`,
+      'LANGUAGE_MISSING',
+      {
+        language: opts.language,
+        available: scan.languages.map((l) => l.language).join(', '),
+      },
     );
   }
+
+  // 0.1.11 : chrome du PDF (couverture, TOC, replis visibles) dans la langue
+  // du WIKI sélectionné — jamais celle de l'interface.
+  const copy = pdfCopyFor(opts.language);
 
   const warnings: CoreWarning[] = [];
 
@@ -102,7 +113,9 @@ async function prepareDocument(
   const knownAnchors = new Set<string>();
   for (const node of flatLeaves) {
     const md = await fs.readFile(node.filePath, 'utf8');
-    const rendered = renderPageMarkdown(md, node.id);
+    const rendered = renderPageMarkdown(md, node.id, {
+      mermaidFallbackTitle: copy.mermaidFallbackTitle,
+    });
     drafts.push({ node, html: rendered.html });
     for (const match of rendered.html.matchAll(/id="([^"]+)"/g)) {
       const id = match[1];
@@ -135,6 +148,7 @@ async function prepareDocument(
       phase: 'render',
       page: done,
       total,
+      title: draft.node.title,
       label: `Rendu de la page ${done}/${total} : ${draft.node.title}`,
     });
   }
@@ -278,6 +292,7 @@ function mermaidWarnings(
   for (const r of repaired) {
     warnings.push({
       code: 'MERMAID_REPAIRED',
+      vars: { src: r.src },
       message: `Diagramme adapté (syntaxe non standard Qoder) — source: ${r.src}`,
       page: r.pageId ?? undefined,
     });
@@ -290,6 +305,7 @@ function mermaidWarnings(
     const src = typeof f.src === 'string' ? f.src.slice(0, 120) : '';
     warnings.push({
       code: 'MERMAID_INVALID',
+      vars: { error, src },
       message: `${error} — source: ${src}`,
       page: f.pageId ?? undefined,
     });
@@ -333,6 +349,7 @@ export async function runExport(
   const found = await locateSections(pdf, prepared.marks, (id) => {
     warnings.push({
       code: 'SECTION_MARK_MISSING',
+      vars: { id },
       message: `Repère de section ${id} introuvable dans le PDF ; signet omis.`,
       page: id,
     });
@@ -344,11 +361,13 @@ export async function runExport(
   // (prepareDocument coupe la <section class="cover">), la page TOC existe
   // TOUJOURS dans le PDF et occupe désormais la page 0 → on garde son signet,
   // décalé, au lieu de le perdre.
+  // 0.1.11 : libellés fixes du PDF (couverture/TOC) dans la LANGUE DU WIKI.
+  const copy = pdfCopyFor(opts.language);
   if (opts.includeCover) {
-    outline.push({ title: 'Couverture', level: 1, pageIndex: 0 });
-    outline.push({ title: 'Table des matières', level: 1, pageIndex: 1 });
+    outline.push({ title: copy.cover, level: 1, pageIndex: 0 });
+    outline.push({ title: copy.tocTitle, level: 1, pageIndex: 1 });
   } else {
-    outline.push({ title: 'Table des matières', level: 1, pageIndex: 0 });
+    outline.push({ title: copy.tocTitle, level: 1, pageIndex: 0 });
   }
   for (const node of flattenToc(prepared.toc)) {
     const pageIndex = found.get(node.id);
@@ -370,7 +389,11 @@ export async function runExport(
   const outDir = opts.outputDir ?? opts.projectRoot;
   const dirStat = await fs.stat(outDir).catch(() => null);
   if (dirStat && !dirStat.isDirectory()) {
-    throw new Error(`Output folder is not a directory: ${outDir}`);
+    throw new RpcError(
+      `Output folder is not a directory: ${outDir}`,
+      'OUTPUT_NOT_DIR',
+      { path: outDir },
+    );
   }
   if (!dirStat) {
     await fs.mkdir(outDir, { recursive: true });
@@ -383,8 +406,10 @@ export async function runExport(
     await fs.writeFile(outputPath, polished);
   } catch (cause) {
     const detail = cause instanceof Error ? cause.message : String(cause);
-    throw new Error(
+    throw new RpcError(
       `Cannot write ${outputPath} — ${detail}. Close the PDF if it is open in a reader, or pick another output folder.`,
+      'WRITE_FAILED',
+      { path: outputPath, detail },
     );
   }
 

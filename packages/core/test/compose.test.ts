@@ -56,8 +56,9 @@ describe('composeDocument', () => {
     });
     expect(html.startsWith('<!DOCTYPE html>')).toBe(true);
     expect(html).toContain('<style>x{}</style>');
+    // 0.1.11 : chrome suivant la langue du wiki → « English » → anglais.
     expect(html).toContain(
-      '<p class="cover-kicker">Documentation technique</p>',
+      '<p class="cover-kicker">Technical Documentation</p>',
     );
     expect(html).toContain('RepoWiki — English — 09/10/2026');
     expect(html).toContain('<section class="toc-page">');
@@ -106,5 +107,50 @@ describe('composeDocument', () => {
       { id: 'p-001', level: 1, title: 'A & <b>' },
       { id: 'p-002', level: 2, title: 'B' },
     ]);
+  });
+
+  // 0.1.11 : le chrome du PDF (gabarit de couverture / titres fixes) suit la
+  // LANGUE DU WIKI (languageLabel), jamais la langue de l'interface.
+  it('chrome EN quand la langue du wiki est English/en', () => {
+    const { html } = composeDocument({
+      projectName: 'P',
+      languageLabel: 'en',
+      dateLabel: '09/10/2026',
+      toc,
+      pages,
+      css: 'x{}',
+    });
+    expect(html).toContain(
+      '<p class="cover-kicker">Technical Documentation</p>',
+    );
+    expect(html).toContain('<h1 class="page-title">Table of Contents</h1>');
+  });
+
+  it('chrome 中文 quand la langue du wiki est zh', () => {
+    const { html } = composeDocument({
+      projectName: 'P',
+      languageLabel: 'zh',
+      dateLabel: '09/10/2026',
+      toc,
+      pages,
+      css: 'x{}',
+    });
+    expect(html).toContain('<p class="cover-kicker">技术文档</p>');
+    expect(html).toContain('<h1 class="page-title">目录</h1>');
+  });
+
+  it('chrome FR par défaut pour les autres langues du wiki', () => {
+    const { html } = composeDocument({
+      projectName: 'P',
+      languageLabel: 'de',
+      dateLabel: '09/10/2026',
+      toc,
+      pages,
+      css: 'x{}',
+    });
+    expect(html).toContain(
+      '<p class="cover-kicker">Documentation technique</p>',
+    );
+    expect(html).toContain('<h1 class="page-title">Table des matières</h1>');
   });
 });

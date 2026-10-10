@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ProgressEvent } from '../../src/ipc.js';
 import { bridgeErrorMessage } from '../bridge.js';
 import { useI18n } from '../i18n/index.js';
+import { progressText } from '../i18n/messages.js';
 
 // Mapping déterministe des poids (brief Task 13, étape 2) :
 // - render  : 0 → 50 %   (progressif, page/total émis par le pipeline)
@@ -68,7 +69,7 @@ export default function ProgressBar() {
         <div className="progress-fill" style={{ width: `${percent}%` }} />
       </div>
       <p className="muted">
-        {event?.label ?? t('preparingExport')} — {percent} %
+        {progressText(event, t)} — {percent} %
       </p>
       {/* Bannière cohérente avec le motif bridgeErrorMessage (Report.tsx) :
           un échec d'abonnement devient un message VISIBLE, jamais une page

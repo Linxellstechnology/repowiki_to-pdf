@@ -175,9 +175,13 @@ await check('signets-min-3', async () => {
 //    L'assertion est inconditionnelle par lien (aucun skip /A GoTo, aucun guard
 //    destRefs.has) — le test échoue si Chromium émet une destination absente.
 const destRefs = destNameRefs(pdfDoc);
+// 0.1.11 : le chrome du PDF suit la langue du wiki (fixture = en) ; la page
+// TOC se repère à l'un des titres connus.
+const TOC_TITLES = ['Table des matières', 'Table of Contents', '目录'];
 const tocPage = await (async () => {
   for (let i = 1; i <= jsDoc.numPages; i++) {
-    if ((await pageText(jsDoc, i)).includes('Table des matières')) return i;
+    const text = await pageText(jsDoc, i);
+    if (TOC_TITLES.some((title) => text.includes(title))) return i;
   }
   throw new Error('page TOC introuvable');
 })();
@@ -262,11 +266,18 @@ await check('lien-web-uri', async () => {
   return `pdfjs: ${jsUri.join(' ')} | raw /S /URI: ${raw}`;
 });
 
-// 7. Le diagramme invalide a son texte de repli « Diagramme non généré ».
+// 7. Le diagramme invalide a son texte de repli (0.1.11 : le repli suit la
+//    langue du wiki — fixture « en » → « Mermaid diagram not rendered »).
+const FALLBACK_TITLES = [
+  'Diagramme non généré',
+  'Mermaid diagram not rendered',
+  '未能渲染 Mermaid 图表',
+];
+const hasFallback = (t) => FALLBACK_TITLES.some((s) => t.includes(s));
 await check('mermaid-invalide-repli', async () => {
   const all = [];
   for (let i = 1; i <= jsDoc.numPages; i++) all.push(await pageText(jsDoc, i));
-  const page = all.findIndex((t) => t.includes('Diagramme non généré')) + 1;
+  const page = all.findIndex(hasFallback) + 1;
   assert(page >= 1, 'texte de repli introuvable');
   return `page ${page}`;
 });
@@ -381,8 +392,8 @@ await check('mermaid12-enum-canary', async () => {
     `« CmsRole » + « editor » absents des pages ${start}–${end} — classDiagram <<enum>> non rendu (v12 ?)`,
   );
   assert(
-    !text.includes('Diagramme non généré'),
-    `repli « Diagramme non généré » sur la page ${found} — enum v12 n'a pas été rendu`,
+    !hasFallback(text),
+    `texte de repli mermaid sur la page ${found} — enum v12 n'a pas été rendu`,
   );
   return `pages ${start}–${end} (§§p-002§§) : CmsRole + editor rendus en SVG (page ${found})`;
 });
@@ -407,12 +418,23 @@ await check('mermaid-repair-double-passe', async () => {
       typeof w.message === 'string' && w.message.includes('source:'),
       `MERMAID_REPAIRED sans extrait de source : ${JSON.stringify(w.message)}`,
     );
+    // 0.1.11 : jetons machine pour la ligne localisée du renderer.
+    assert(
+      typeof w.vars?.src === 'string' && w.vars.src.length > 0,
+      `MERMAID_REPAIRED sans vars.src : ${JSON.stringify(w.vars)}`,
+    );
   }
   const invalid = warnings.filter((w) => w && w.code === 'MERMAID_INVALID');
   assert(
     invalid.length === 1,
     `MERMAID_INVALID = ${invalid.length} (attendu : exactement 1 — le bloc cassé doit rester le seul)`,
   );
+  for (const w of invalid) {
+    assert(
+      typeof w.vars?.error === 'string' && typeof w.vars?.src === 'string',
+      `MERMAID_INVALID sans vars {error, src} : ${JSON.stringify(w.vars)}`,
+    );
+  }
   const start = markerPages.get('p-002');
   assert(start !== undefined, 'section §§p-002§§ (Architecture) introuvable');
   const laterPages = [...markerPages.values()].filter((p) => p > start);

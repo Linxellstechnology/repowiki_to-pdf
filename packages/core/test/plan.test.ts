@@ -124,6 +124,28 @@ describe('buildToc', () => {
     ).toBe(true);
     expect(toc.map((t) => t.title)).not.toContain('Chapitre fantôme');
   });
+
+  // 0.1.11 : vars structurés — le renderer localise la ligne affichée
+  // (EN/中文) à partir de `vars`, sans parser le message français brut.
+  it('PAGE_NOT_IN_PLAN porte vars { file }', () => {
+    const { warnings } = buildToc(
+      { documents: [{ title: 'Architecture' }] },
+      files,
+    );
+    const orphan = warnings.find((w) => w.code === 'PAGE_NOT_IN_PLAN');
+    expect(orphan?.vars).toEqual({ file: "1. Vue d'ensemble" });
+  });
+
+  it('PLAN_TITLE_UNMATCHED porte vars { title }', () => {
+    const { warnings } = buildToc(
+      {
+        documents: [{ title: 'Architecture' }, { title: 'Chapitre fantôme' }],
+      },
+      files,
+    );
+    const unmatched = warnings.find((w) => w.code === 'PLAN_TITLE_UNMATCHED');
+    expect(unmatched?.vars).toEqual({ title: 'Chapitre fantôme' });
+  });
 });
 
 describe('buildToc — fallback repowiki-metadata.json (sans wiki_plan.yaml)', () => {

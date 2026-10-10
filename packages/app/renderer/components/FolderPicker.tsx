@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ScanResult } from '../../src/ipc.js';
 import { bridgeErrorMessage } from '../bridge.js';
 import { useI18n } from '../i18n/index.js';
+import { errorText } from '../i18n/messages.js';
 
 interface FolderPickerProps {
   // Remonte le résultat du check (ou null après un check raté) : l'App s'en
@@ -13,10 +14,10 @@ interface FolderPickerProps {
 // dictionnaires i18n) : input chemin + bouton « Browse… » (dialogue natif)
 // puis bouton « Check » via window.api.scan. Machine à états VISIBLE :
 // ⏳ « Checking… » pendant l'appel, pill vert « Wiki found — N pages ·
-// languages: … » si ≥ 1 langue, sinon bannière rouge. Les messages d'erreur
-// du core (français) restent verbatim — hors scope renderer. Chaque appel
-// window.api est entouré d'un try/catch (FIX 2) dont le repli localisé est
-// t('bridgeUnavailable').
+// languages: … » si ≥ 1 langue, sinon bannière rouge. 0.1.11 : les erreurs
+// du moteur identifiées par code machine sont localisées (errorText) ; les
+// autres restent brutes. Chaque appel window.api est entouré d'un try/catch
+// (FIX 2) dont le repli localisé est t('bridgeUnavailable').
 export default function FolderPicker({ onScanChange }: FolderPickerProps) {
   const { t } = useI18n();
   const [projectRoot, setProjectRoot] = useState('');
@@ -31,7 +32,7 @@ export default function FolderPicker({ onScanChange }: FolderPickerProps) {
       if (result.ok) {
         if (result.value !== null) setProjectRoot(result.value);
       } else {
-        setError(result.error);
+        setError(errorText(result, t));
       }
     } catch (cause) {
       setError(bridgeErrorMessage(cause, t('bridgeUnavailable')));
@@ -52,7 +53,7 @@ export default function FolderPicker({ onScanChange }: FolderPickerProps) {
           setError(t('noLanguageFound'));
         }
       } else {
-        setError(result.error);
+        setError(errorText(result, t));
       }
     } catch (cause) {
       setError(bridgeErrorMessage(cause, t('bridgeUnavailable')));

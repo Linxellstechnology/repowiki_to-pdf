@@ -14,6 +14,8 @@ export interface ProgressEvent {
   phase: 'render' | 'mermaid' | 'print' | 'polish' | 'write';
   page?: number;
   total?: number;
+  /** 0.1.11 : titre de la section en cours (phase render) — ligne localisée. */
+  title?: string;
   label: string;
 }
 
@@ -30,9 +32,28 @@ export interface PreviewResult {
 // Enveloppe de tous les invokes (ruling n°5) : `ipcMain.handle` ne rejette
 // jamais — une erreur (ex. WikiNotFoundError) est mappée en { ok: false, error }
 // pour survivre à la sérialisation structured-clone côté renderer.
+// 0.1.11 : `errorCode`/`errorVars` machine (si l'erreur porte `code`/`vars`)
+// permettent au renderer d'afficher une phrase localisée EN/中文.
 export type IpcResult<T> =
   | { ok: true; value: T }
-  | { ok: false; error: string };
+  | {
+      ok: false;
+      error: string;
+      errorCode?: string;
+      errorVars?: Record<string, string>;
+    };
+
+/** Erreur applicative portant un code machine + des jetons d'affichage. */
+export class RpcError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly vars?: Record<string, string>,
+  ) {
+    super(message);
+    this.name = 'RpcError';
+  }
+}
 
 export const CH = {
   scan: 'scan',

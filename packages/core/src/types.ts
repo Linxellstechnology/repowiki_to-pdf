@@ -41,6 +41,12 @@ export interface CoreWarning {
   code: string;
   message: string;
   page?: string;
+  /**
+   * 0.1.11 : jetons machine (anglais, ex. `kind: 'missing'`) permettant au
+   * renderer de localiser la ligne affichée sans parser `message` (brut,
+   * diagnostic uniquement).
+   */
+  vars?: Record<string, string>;
 }
 
 export interface RenderedPage {

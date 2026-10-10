@@ -23,8 +23,12 @@ function escapeMermaidSource(source: string): string {
  * `id` du wrapper `mbrd-<n>` que lorsqu'il est fourni : un appel direct sans
  * index produit un bloc valide mais sans `id`.
  */
-export function renderMermaidBlock(source: string, index?: number): string {
+export function renderMermaidBlock(
+  source: string,
+  index?: number,
+  fallbackTitle = 'Diagramme non généré',
+): string {
   const esc = escapeMermaidSource(source);
   const idAttr = index === undefined ? '' : ` id="mbrd-${index}"`;
-  return `<div class="mermaid-block"${idAttr}><div class="mermaid" data-src="${esc}"></div><div class="mermaid-fallback" hidden><p>⚠ <strong>Diagramme non généré</strong> — source :</p><pre><code>${esc}</code></pre></div></div>`;
+  return `<div class="mermaid-block"${idAttr}><div class="mermaid" data-src="${esc}"></div><div class="mermaid-fallback" hidden><p>⚠ <strong>${fallbackTitle}</strong> — source :</p><pre><code>${esc}</code></pre></div></div>`;
 }

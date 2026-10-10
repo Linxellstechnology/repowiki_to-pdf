@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file. The format
 follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.11] - 2026-10-10
+
+### Changed
+
+- The interface is now **fully** in the selected language (EN / 中文): engine report lines (all ten codes) are localized sentences instead of raw French, progress phase labels are localized, and known engine errors (missing wiki, unwritable output, missing language) show a localized message. The original technical message stays available under each line's collapsible *technical detail*.
+- "Warnings" renamed to **"Info"** throughout the UI (the codes are informational by design; severity is carried by the code itself).
+- The PDF's own fixed texts (cover kicker, table-of-contents title, missing-page and diagram placeholders, and the Cover/Contents bookmarks) now follow the **wiki's** language — English or 中文 wikis produce English/Chinese chrome; other wiki languages fall back to French. UI language never affects the PDF.
+
+### Internal
+
+- `CoreWarning.vars` machine tokens (code + kind) drive UI localization; the IPC error envelope can carry `errorCode`/`errorVars`; new `pdfCopyFor()` copy table; +19 tests (core vars, resolver EN/zh, dictionary parity).
+
 ## [0.1.10] - 2026-10-10
 
 ### Fixed

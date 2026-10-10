@@ -54,6 +54,12 @@ describe('scanProject', () => {
     const fr = r.languages.find((l) => l.language === 'fr');
     expect(fr?.metaPath).toBeNull();
   });
+  it('WikiNotFoundError porte le code machine WIKI_NOT_FOUND (0.1.11)', () => {
+    const err = new WikiNotFoundError('/x');
+    expect(err.code).toBe('WIKI_NOT_FOUND');
+    expect(err.vars).toEqual({ path: '/x' });
+  });
+
   it('lève WikiNotFoundError sans .qoder/repowiki', async () => {
     // Root vide créé dans le tmpdir OS : jamais impacté par un .qoder/repowiki
     // généré pour ce dépôt.

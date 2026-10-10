@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ExportOptions } from '../../src/ipc.js';
 import { bridgeErrorMessage } from '../bridge.js';
 import { useI18n } from '../i18n/index.js';
+import { errorText } from '../i18n/messages.js';
 
 interface PreviewProps {
   opts: ExportOptions | null;
@@ -40,7 +41,7 @@ export default function Preview({ opts }: PreviewProps) {
         setHtml(result.value.html);
       } else {
         setHtml(null);
-        setError(result.error);
+        setError(errorText(result, t));
       }
     } catch (cause) {
       setHtml(null);

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import type { ExportResult } from '../../src/ipc.js';
 import { bridgeErrorMessage } from '../bridge.js';
 import { useI18n } from '../i18n/index.js';
+import { errorText, warningText } from '../i18n/messages.js';
 
 interface ReportProps {
   result: ExportResult | null;
@@ -31,9 +32,10 @@ function groupByCode(warnings: CoreWarning[]): [string, WarningEntry[]][] {
 // Carte résultat (0.1.5) : chemin du PDF, deux actions aux libellés exacts
 // du owner — « Open The File » (shell.openPath) et « Print » (canal
 // print-pdf → Start-Process -Verb Print, imprimante par défaut), nombre de
-// pages, puis rapport « Warnings (N) » groupé par CODE (<details> natif).
-// Les codes (MERMAID_INVALID, …) sont techniques → conservés verbatim ; les
-// messages viennent du core (français) → acceptés tels quels.
+// pages, puis rapport « Info (N) » groupé par CODE (<details> natif).
+// 0.1.11 : les lignes sont localisées (code + vars → dictionnaire EN/中文) ;
+// le message brut du moteur reste en détail repliable. Codes techniques
+// conservés verbatim (stables entre langues, documentés dans Help).
 // Les deux actions attrapent les exceptions de passerelle (FIX 2).
 export default function Report({ result }: ReportProps) {
   const { t } = useI18n();
@@ -60,7 +62,7 @@ export default function Report({ result }: ReportProps) {
     setActionError(null);
     try {
       const response = await window.api.openPdf(result.outputPath);
-      if (!response.ok) setActionError(response.error);
+      if (!response.ok) setActionError(errorText(response, t));
     } catch (cause) {
       setActionError(bridgeErrorMessage(cause, t('bridgeUnavailable')));
     }
@@ -75,7 +77,7 @@ export default function Report({ result }: ReportProps) {
       if (response.ok) {
         setPrintNote(t('printSent'));
       } else {
-        setActionError(response.error);
+        setActionError(errorText(response, t));
       }
     } catch (cause) {
       setActionError(bridgeErrorMessage(cause, t('bridgeUnavailable')));
@@ -129,14 +131,26 @@ export default function Report({ result }: ReportProps) {
               <li key={code}>
                 <strong>{code}</strong> ({warnings.length})
                 <ul>
-                  {warnings.map((entry) => (
-                    <li key={entry.id}>
-                      {entry.warning.message}
-                      {entry.warning.page !== undefined
-                        ? ` [${entry.warning.page}]`
-                        : ''}
-                    </li>
-                  ))}
+                  {warnings.map((entry) => {
+                    // 0.1.11 : ligne localisée (EN/中文) depuis code+vars ; le
+                    // message brut du moteur reste en détail repliable.
+                    const line = warningText(entry.warning, t);
+                    const raw = entry.warning.message;
+                    return (
+                      <li key={entry.id}>
+                        {line}
+                        {entry.warning.page !== undefined
+                          ? ` [${entry.warning.page}]`
+                          : ''}
+                        {line !== raw && (
+                          <details className="raw-detail">
+                            <summary>{t('details')}</summary>
+                            {raw}
+                          </details>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </li>
             ))}

@@ -10,6 +10,7 @@ import Preview from './components/Preview';
 import ProgressBar from './components/ProgressBar';
 import Report from './components/Report';
 import { useI18n } from './i18n/index.js';
+import { errorText } from './i18n/messages.js';
 
 // Gating (inchangé) : Options/Build PDF verrouillés tant qu'aucune option
 // valide n'est produite (check réussi). Hint unique sur les boutons (title)
@@ -68,7 +69,7 @@ export default function App() {
       if (result.ok) {
         setReport(result.value);
       } else {
-        setExportError(result.error);
+        setExportError(errorText(result, t));
       }
     } catch (cause) {
       setExportError(bridgeErrorMessage(cause, t('bridgeUnavailable')));

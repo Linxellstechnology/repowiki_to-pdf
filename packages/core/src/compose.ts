@@ -14,6 +14,50 @@ export function flattenToc(toc: TocNode[]): TocNode[] {
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+/**
+ * 0.1.11 : chrome du PDF (couverture, titre de TOC, page manquante, signets
+ * fixes) — suit la LANGUE DU WIKI (`languageLabel` = code 'en'/'zh'/… fourni
+ * par le scan), jamais la langue de l'interface. Repli : français.
+ */
+export interface PdfCopy {
+  cover: string;
+  kicker: string;
+  tocTitle: string;
+  pageUnavailable: string;
+  mermaidFallbackTitle: string;
+}
+
+const PDF_COPY: Record<'en' | 'zh' | 'fr', PdfCopy> = {
+  en: {
+    cover: 'Cover',
+    kicker: 'Technical Documentation',
+    tocTitle: 'Table of Contents',
+    pageUnavailable: 'Page unavailable.',
+    mermaidFallbackTitle: 'Mermaid diagram not rendered',
+  },
+  zh: {
+    cover: '封面',
+    kicker: '技术文档',
+    tocTitle: '目录',
+    pageUnavailable: '页面不可用。',
+    mermaidFallbackTitle: '未能渲染 Mermaid 图表',
+  },
+  fr: {
+    cover: 'Couverture',
+    kicker: 'Documentation technique',
+    tocTitle: 'Table des matières',
+    pageUnavailable: 'Page indisponible.',
+    mermaidFallbackTitle: 'Diagramme non généré',
+  },
+};
+
+export function pdfCopyFor(languageLabel: string): PdfCopy {
+  const l = languageLabel.toLowerCase();
+  if (l.startsWith('en')) return PDF_COPY.en;
+  if (l.startsWith('zh')) return PDF_COPY.zh;
+  return PDF_COPY.fr;
+}
+
 export interface ComposeInput {
   projectName: string;
   languageLabel: string;
@@ -39,6 +83,7 @@ export function composeDocument(input: ComposeInput): {
   html: string;
   marks: SectionMark[];
 } {
+  const copy = pdfCopyFor(input.languageLabel);
   const flat = flattenToc(input.toc);
   const marks: SectionMark[] = flat.map((n) => ({
     id: n.id,
@@ -50,7 +95,7 @@ export function composeDocument(input: ComposeInput): {
       const page = input.pages.get(n.id);
       const body = page
         ? page.html
-        : '<p class="img-missing">Page indisponible.</p>';
+        : `<p class="img-missing">${copy.pageUnavailable}</p>`;
       return `<section class="wiki-page" id="${n.id}"><h1 class="page-title">${esc(
         n.title,
       )}</h1><span class="sec-marker">§§${n.id}§§</span>${body}</section>`;
@@ -59,12 +104,12 @@ export function composeDocument(input: ComposeInput): {
   const html = `<!DOCTYPE html><html lang="${input.languageLabel}"><head><meta charset="utf-8"><title>${esc(
     input.projectName,
   )}</title><style>${input.css}</style></head><body>
-<section class="cover"><p class="cover-kicker">Documentation technique</p><h1>${esc(
+<section class="cover"><p class="cover-kicker">${copy.kicker}</p><h1>${esc(
     input.projectName,
   )}</h1><p class="cover-meta">RepoWiki — ${esc(input.languageLabel)} — ${esc(
     input.dateLabel,
   )}</p></section>
-<section class="toc-page"><h1 class="page-title">Table des matières</h1>${tocList(
+<section class="toc-page"><h1 class="page-title">${copy.tocTitle}</h1>${tocList(
     input.toc,
   )}</section>
 ${sections}

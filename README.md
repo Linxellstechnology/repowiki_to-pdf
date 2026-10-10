@@ -2,7 +2,7 @@
 
 **Qoder generates a beautiful Repo Wiki — then locks it inside the IDE. REPOWIKI TO PDF turns it into a single, vector, print-ready document your clients can actually receive.**
 
-![Release](https://img.shields.io/badge/release-v0.1.10-green)
+![Release](https://img.shields.io/badge/release-v0.1.11-green)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-0078d7)
 ![License](https://img.shields.io/badge/license-MIT-1d1d1f)
 ![UI languages](https://img.shields.io/badge/UI-EN%20%2F%20%E4%B8%AD%E6%96%87-7c6bf5)
@@ -68,7 +68,7 @@ npm run test:integration -w @repowiki-pdf/app # fixture → PDF structural asser
 npm run dist -w @repowiki-pdf/app            # electron-builder → release/ (NSIS + portable)
 ```
 
-> Installers are not published in the repo tree (GitHub file-size limits): grab `repowiki-to-pdf Setup 0.1.10.exe` / `repowiki-to-pdf Portable 0.1.10.exe` from the GitHub Releases page.
+> Installers are not published in the repo tree (GitHub file-size limits): grab `repowiki-to-pdf Setup 0.1.11.exe` / `repowiki-to-pdf Portable 0.1.11.exe` from the GitHub Releases page.
 
 ## How to use
 
@@ -76,9 +76,9 @@ npm run dist -w @repowiki-pdf/app            # electron-builder → release/ (NS
 2. **Check** — the app scans the wiki, lists languages and page counts, and unlocks the next steps.
 3. **Options** — page size (A4 / Letter), cover on/off, language, output folder (blank = project root).
 4. **Build PDF** — progress advances page by page; a live WYSIWYG preview sits beside the controls.
-5. **Open / Print** — a report shows the output path, page count and warnings, with one-click **Open The File** and **Print**. The document is written to `<Project>-Documentation.pdf`.
+5. **Open / Print** — a report shows the output path, page count and the info report, with one-click **Open The File** and **Print**. The document is written to `<Project>-Documentation.pdf`.
 
-## Warning codes
+## Info codes
 
 The build never fails on a single local problem — it degrades gracefully and tells you exactly what happened:
 
@@ -99,7 +99,7 @@ The build never fails on a single local problem — it degrades gracefully and t
 
 - **No automatic landscape pages.** Very wide diagrams scale to fit the portrait width; the landscape hook exists in the print CSS but is dormant (decision recorded internally — Architecture Decision Records available on request).
 - **EXE file icon is the Electron default.** The signing/rcedit step is skipped in our build environment, so the binary itself keeps stock branding; window, taskbar and installer icons are custom.
-- **Core-produced messages remain in French** (errors, phase labels, warning detail text). The app UI — including Documentation and About — is fully EN/中文; warning *codes* are technical and always verbatim.
+- **Interface language ≠ PDF language, on purpose.** Everything on screen (including report lines, progress phases and engine errors) follows the selected UI language, EN or 中文; the PDF's own fixed texts (cover, contents title, placeholders) follow the **wiki's** language. Raw engine diagnostics stay available under each info line's collapsible *technical detail*, and codes are technical — always verbatim.
 - One language per export; GUI-only (no CLI); folder input is picker or paste, not drag-and-drop.
 
 ## Architecture

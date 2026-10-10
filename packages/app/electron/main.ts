@@ -36,9 +36,17 @@ async function guard<T>(fn: () => Promise<T>): Promise<IpcResult<T>> {
   try {
     return { ok: true, value: await fn() };
   } catch (cause) {
+    // 0.1.11 : si l'erreur porte un code machine (+ jetons `vars`), il est
+    // sérialisé avec le message brut → phrase localisée côté renderer.
+    const code = (cause as { code?: unknown } | undefined | null)?.code;
+    const vars = (cause as { vars?: unknown } | undefined | null)?.vars;
     return {
       ok: false,
       error: cause instanceof Error ? cause.message : String(cause),
+      ...(typeof code === 'string' ? { errorCode: code } : {}),
+      ...(typeof vars === 'object' && vars !== null
+        ? { errorVars: vars as Record<string, string> }
+        : {}),
     };
   }
 }

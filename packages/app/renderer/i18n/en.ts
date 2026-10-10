@@ -53,15 +53,56 @@ export const en = {
     'Building your document — this may take a while on larger projects.',
   preparingExport: 'Preparing the export…',
 
-  // Rapport (actions + warnings)
+  // Rapport (actions + info) — 0.1.11 : « warnings » devenu « info », lignes
+  // localisées depuis les codes du moteur (messages bruts en détail).
   openTheFile: 'Open The File',
   openTheFileTitle: 'Open the PDF with the default application.',
   print: 'Print',
   printing: 'Printing…',
   printTitle: 'Print on the default printer (Windows).',
   printSent: 'Print job sent to the default printer.',
-  pageWarningCount: '{pages} pages · {warnings} warnings',
-  warningsGroup: 'Warnings ({n})',
+  pageWarningCount: '{pages} pages · {warnings} info',
+  warningsGroup: 'Info ({n})',
+  details: 'technical detail',
+
+  // Lignes d’info du rapport (une par code moteur + variante de `kind`)
+  infoPlanMissing: 'No wiki_plan.yaml — pages were ordered alphabetically.',
+  infoPlanMetadataUsed:
+    'No wiki_plan.yaml — table of contents rebuilt from the wiki metadata (Qoder catalog order).',
+  infoPlanTitleUnmatched: 'Plan entry “{title}” matches no page file.',
+  infoPageNotInPlan:
+    '“{file}” is not in the plan — appended at the end of the table of contents.',
+  infoBrokenLinkMissing:
+    'Link to {target} not found in the wiki — left unchanged.',
+  infoBrokenLinkMalformed:
+    'Link to {target} is malformed (invalid % encoding) — left unchanged.',
+  infoLinkFragAbsent:
+    'Anchor #{frag} not found in {target} — link now points to the page.',
+  infoLinkFragMalformed:
+    'Anchor #{frag} is malformed in {target} — link now points to the page.',
+  infoImageMissing: 'Image not found: {src} — a placeholder was rendered.',
+  infoMermaidRepaired:
+    'Diagram auto-adapted (non-standard Qoder syntax) — rendered as vectors. Source excerpt: {src}',
+  infoMermaidInvalid:
+    'Diagram failed to parse even after the repair pass — placeholder rendered. Error: {error} · Source: {src}',
+  infoSectionMarkMissing:
+    'Section marker {id} not found in the PDF — bookmark omitted.',
+
+  // Phases de progression (émises par le pipeline ; libellés localisés ici)
+  phaseRender: 'Rendering {page}/{total}: {title}',
+  phaseMermaid: 'Rendering Mermaid diagrams…',
+  phasePrint: 'Printing the PDF…',
+  phasePolish: 'Locating sections and adding bookmarks…',
+  phaseWrite: 'Writing the PDF file…',
+
+  // Erreurs moteur identifiées par code machine
+  errWikiNotFound:
+    'No RepoWiki found in {path} — generate the Repo Wiki in Qoder first (Repo Wiki panel → Generate), then reload this folder.',
+  errWriteFailed:
+    'Cannot write {path} — {detail}. Close the PDF if it is open in a reader, or pick another output folder.',
+  errOutputNotDir: 'Output folder is not a directory: {path}',
+  errLanguageMissing:
+    'Language “{language}” is missing from the wiki (available: {available}).',
 
   // Replicat localisable du message « bridge absent » (bridge.ts)
   bridgeUnavailable:
@@ -90,7 +131,7 @@ export const en = {
   docsStep4: 'Check → Options → Build PDF → Open or Print.',
   docsReportTitle: 'Understanding the report',
   docsReportIntro:
-    'Build warnings are grouped by code — here is what each one means.',
+    'Report items are grouped by code — here is what each one means.',
   warnTableCode: 'Code',
   warnTableMeaning: 'Meaning',
   warnPlanMissing: 'No wiki_plan.yaml — pages were ordered alphabetically.',

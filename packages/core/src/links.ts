@@ -68,6 +68,7 @@ export function rewriteLinks(
       // signale (message avec l'`href` brut) plutôt qu'abandonner l'export (N1).
       warnings.push({
         code: 'BROKEN_LINK',
+        vars: { target: href, kind: 'malformed' },
         message: `Lien vers ${href} malformé (encodage % invalide).`,
       });
       return null;
@@ -77,6 +78,7 @@ export function rewriteLinks(
     if (!pageId) {
       warnings.push({
         code: 'BROKEN_LINK',
+        vars: { target: rel, kind: 'missing' },
         message: `Lien vers ${rel} introuvable dans le wiki.`,
       });
       return null;
@@ -88,6 +90,7 @@ export function rewriteLinks(
         // reste valable vers la page (pas de throw, N1).
         warnings.push({
           code: 'LINK_FRAG_DROPPED',
+          vars: { frag, target: rel, kind: 'malformed' },
           message: `Ancre #${frag} malformée dans ${rel} ; lien ramené à la page.`,
         });
         return `#${pageId}`;
@@ -96,6 +99,7 @@ export function rewriteLinks(
       if (knownAnchors && !knownAnchors.has(anchor)) {
         warnings.push({
           code: 'LINK_FRAG_DROPPED',
+          vars: { frag, target: rel, kind: 'absent' },
           message: `Ancre #${frag} absente de ${rel} ; lien ramené à la page.`,
         });
         return `#${pageId}`;
@@ -154,6 +158,7 @@ export async function embedImages(
         warned.add(src);
         warnings.push({
           code: 'IMAGE_MISSING',
+          vars: { src },
           message: `Image absente : ${src}.`,
         });
       }

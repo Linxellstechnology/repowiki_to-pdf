@@ -46,7 +46,8 @@ describe('dictionnaires i18n', () => {
     expect(zh.preview).toBe('预览');
     expect(zh.done).toBe('完成');
     expect(zh.failed).toBe('失败');
-    expect(zh.warningsGroup).toContain('警告');
+    // 0.1.11 : « warnings » rebaptisé « info » (警告 → 信息).
+    expect(zh.warningsGroup).toContain('信息');
   });
 });
 

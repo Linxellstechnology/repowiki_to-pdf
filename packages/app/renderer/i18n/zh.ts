@@ -52,15 +52,49 @@ export const zh: UiStrings = {
   progressMessage: '正在生成文档 —— 大型项目可能需要较长时间。',
   preparingExport: '正在准备导出…',
 
-  // 报告（操作 + 警告）
+  // 报告（操作 + 信息）
   openTheFile: '打开文件',
   openTheFileTitle: '用默认应用打开 PDF。',
   print: '打印',
   printing: '正在打印…',
   printTitle: '用默认打印机打印（Windows）。',
   printSent: '打印任务已发送到默认打印机。',
-  pageWarningCount: '共 {pages} 页 · {warnings} 条警告',
-  warningsGroup: '警告（{n}）',
+  pageWarningCount: '共 {pages} 页 · {warnings} 条信息',
+  warningsGroup: '信息（{n}）',
+  details: '技术细节',
+
+  // Lignes d’info du rapport (une par code moteur + variante de `kind`)
+  infoPlanMissing: '缺少 wiki_plan.yaml——页面按字母顺序排列。',
+  infoPlanMetadataUsed:
+    '缺少 wiki_plan.yaml——目录已根据 Wiki 元数据重建（Qoder 目录顺序）。',
+  infoPlanTitleUnmatched: '计划条目「{title}」没有对应的页面文件。',
+  infoPageNotInPlan: '「{file}」不在计划中——已追加到目录末尾。',
+  infoBrokenLinkMissing: '未找到指向 {target} 的链接——保持不变。',
+  infoBrokenLinkMalformed:
+    '指向 {target} 的链接格式无效（% 编码错误）——保持不变。',
+  infoLinkFragAbsent: '在 {target} 中未找到锚点 #{frag}——链接指向该页面。',
+  infoLinkFragMalformed: '{target} 中的锚点 #{frag} 格式无效——链接指向该页面。',
+  infoImageMissing: '未找到图片：{src}——已渲染占位符。',
+  infoMermaidRepaired:
+    '图表已自动适配（非标准 Qoder 语法）——以矢量渲染。源码摘录：{src}',
+  infoMermaidInvalid:
+    '图表经修复后仍无法解析——已渲染占位符。错误：{error} · 源码：{src}',
+  infoSectionMarkMissing: 'PDF 中未找到章节标记 {id}——已省略书签。',
+
+  // Phases de progression (émises par le pipeline ; libellés localisés ici)
+  phaseRender: '正在渲染 {page}/{total}：{title}',
+  phaseMermaid: '正在渲染 Mermaid 图表…',
+  phasePrint: '正在生成 PDF…',
+  phasePolish: '正在定位章节并添加书签…',
+  phaseWrite: '正在写入 PDF 文件…',
+
+  // Erreurs moteur identifiées par code machine
+  errWikiNotFound:
+    '在 {path} 中未找到 RepoWiki——请先在 Qoder 中生成 Repo Wiki（Repo Wiki 面板 → 生成），然后重新加载此文件夹。',
+  errWriteFailed:
+    '无法写入 {path}——{detail}。若该 PDF 正在阅读器中打开请先关闭，或另选输出文件夹。',
+  errOutputNotDir: '输出文件夹不是目录：{path}',
+  errLanguageMissing: 'Wiki 中缺少语言「{language}」（可用：{available}）。',
 
   // Replicat localisable du message « bridge absent » (bridge.ts)
   bridgeUnavailable: 'Electron 桥接不可用（缺少 window.api）—— 请重启应用。',
@@ -86,7 +120,7 @@ export const zh: UiStrings = {
     '在本应用中：加载 Wiki 文件夹 = 包含 .qoder/repowiki 的项目根目录。',
   docsStep4: '检查 → 选项 → 生成 PDF → 打开或打印。',
   docsReportTitle: '解读构建报告',
-  docsReportIntro: '构建警告按代码分组，各代码含义如下。',
+  docsReportIntro: '报告条目按代码分组，各代码含义如下。',
   warnTableCode: '代码',
   warnTableMeaning: '含义',
   warnPlanMissing: '缺少 wiki_plan.yaml —— 页面按字母顺序排列。',

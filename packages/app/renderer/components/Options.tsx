@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ExportOptions, ScanResult } from '../../src/ipc.js';
 import { bridgeErrorMessage } from '../bridge.js';
 import { useI18n } from '../i18n/index.js';
+import { errorText } from '../i18n/messages.js';
 
 interface OptionsDraft {
   language: string;
@@ -71,7 +72,7 @@ export default function Options({ scan, onChange }: OptionsProps) {
           setDraft((prev) => ({ ...prev, outputDir: result.value ?? '' }));
         }
       } else {
-        setBrowseError(result.error);
+        setBrowseError(errorText(result, t));
       }
     } catch (cause) {
       setBrowseError(bridgeErrorMessage(cause, t('bridgeUnavailable')));
