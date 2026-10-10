@@ -15,7 +15,13 @@
  *   jamais une source qui rend déjà OK) ; sinon une COPIE réparée.
  * - Chaque règle est gardée par le type de diagramme (première ligne non
  *   vide) : `sequenceDiagram` pour R1, `flowchart`/`graph` pour R2/R3,
- *   `classDiagram` pour R4/R5/R6. Une syntaxe réellement cassée
+ *   `classDiagram` pour R4/R5/R6, `erDiagram` pour R7/R8 (ajouts v0.1.9,
+ *   diagnostic LinXells task-linxells-diag-report.md — réécriture
+ *   proof-rendue OK sous mermaid 12.1.0 dans out/probe-linxells).
+ *   R1 est étendu en v0.1.9 (report : « R9 ») : mot réservé `activate`
+ *   ajouté + boundary de renommage corrigée (`(?![\w-])` → `(?!\w)(?!-\w)`)
+ *   pour les ids collés à gauche d'une flèche (`Activate->>DB`).
+ * - Une syntaxe réellement cassée
  *   (`X --->??? invalid`) ne correspond à aucune règle → `null` : la
  *   réparation ne ressuscite jamais un diagramme invalide, le fallback
  *   `mermaid-fallback` + warning MERMAID_INVALID restent le filet.
@@ -24,6 +30,7 @@
 /** Mots réservés sequenceDiagram (jison, casse-insensible) impossibles en position d'acteur. */
 const SEQUENCE_RESERVED = new Set([
   'actor',
+  'activate',
   'alt',
   'and',
   'autonumber',
@@ -152,14 +159,19 @@ function repairSequence(ctx: DiagramContext): string | null {
     renames.set(id, name);
   }
   // 2. Appliquer le renommage partout en position identifiant (hors
-  //    guillemets et hors texte de message).
+  //    guillemets et hors texte de message). Boundary v0.1.9 (report « R9 ») :
+  //    l'ancien `(?![\w-])` refusait de renommer un id suivi du `-` d'une
+  //    flèche (`Activate->>DB`) → renommage partiel toujours INVALID.
+  //    `(?!\w)(?!-\w)` autorise le `-` de départ de flèche tout en
+  //    protégeant les ids hyphenés (`Activate-job`) et les mots plus longs
+  //    (`Activation`).
   let changed = false;
   const out = ctx.lines.map((line) => {
     const { code, restore } = splitSeqCode(line);
     let next = code;
     for (const [id, name] of renames) {
       const re = new RegExp(
-        `(?<![\\w-])${id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w-])`,
+        `(?<![\\w-])${id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?!\\w)(?!-\\w)`,
         'g',
       );
       if (re.test(next)) {
@@ -311,13 +323,64 @@ function repairClassPipeTargets(lines: string[]): string | null {
 }
 
 /* ------------------------------------------------------------------ *
+ * Règles erDiagram (R7, R8) — ajouts v0.1.9                            *
+ * ------------------------------------------------------------------ */
+
+/** Clés de contrainte erDiagram déjà légales comme 3e mot seul. */
+const ER_KEY = /^(PK|FK|UK)$/;
+
+/**
+ * R7 — erDiagram : ligne d'attribut de EXACTEMENT 3 mots nus dont le 3e
+ * n'est pas PK/FK/UK (`enum identity_status status` = type à deux mots +
+ * colonne, dialecte toléré par Qoder, pas par la grammaire mermaid 12).
+ * Réécriture validée au rendu : hyphenation des deux mots de type →
+ * `enum-identity_status status` (le trait d'union est dans ATTRIBUTE_WORD).
+ * Les lignes de relation (`A ||--o{ B : "x"`) ne matchent jamais.
+ */
+function repairErThreeWord(lines: string[]): string | null {
+  const re =
+    /^([ \t]*)([A-Za-z][\w\[\]-]*) ([A-Za-z][\w-]*) ([A-Za-z][\w-]*)[ \t]*$/;
+  let changed = false;
+  const out = lines.map((line) => {
+    const m = line.match(re);
+    if (!m) return line;
+    const [, ind = '', w1 = '', w2 = '', w3 = ''] = m;
+    if (ER_KEY.test(w3)) return line;
+    changed = true;
+    return `${ind}${w1}-${w2} ${w3}`;
+  });
+  return changed ? out.join('\n') : null;
+}
+
+/**
+ * R8 — erDiagram : plusieurs clés de contrainte séparées par ESPACES
+ * (`uuid property_id PK FK`) ; mermaid 12 exige des clés jointes par
+ * virgules (`PK,FK`). Ne fire que quand les mots nus de fin sont tous
+ * PK/FK/UK (2 à 3). Forme proof-renderée : `uuid property_idPK,FK`.
+ */
+function repairErSpaceKeys(lines: string[]): string | null {
+  const re =
+    /^([ \t]*)([A-Za-z][\w\[\]-]*) ([A-Za-z][\w-]*)((?: (?:PK|FK|UK)){2,3})[ \t]*$/;
+  let changed = false;
+  const out = lines.map((line) => {
+    const m = line.match(re);
+    if (!m) return line;
+    const [, ind = '', t = '', n = '', keys = ''] = m;
+    changed = true;
+    return `${ind}${t} ${n}${keys.trim().split(' ').join(',')}`;
+  });
+  return changed ? out.join('\n') : null;
+}
+
+/* ------------------------------------------------------------------ *
  * Entrée publique                                                     *
  * ------------------------------------------------------------------ */
 
 /**
- * Applique les 6 réécritures validées par le probe, gardées par type de
- * diagramme. Retourne `null` si aucune règle ne s'applique (no-op), sinon
- * la copie réparée de `source`.
+ * Applique les 8 réécritures validées par les probes (R1–R6 task 0.1.3,
+ * R7/R8 + extension R1 v0.1.9), gardées par type de diagramme. Retourne
+ * `null` si aucune règle ne s'applique (no-op), sinon la copie réparée de
+ * `source`.
  */
 export function repairMermaidSource(source: string): string | null {
   const ctx = parseHeader(source);
@@ -337,6 +400,11 @@ export function repairMermaidSource(source: string): string | null {
     if (out !== null) return out;
     return null;
   }
+  if (startsWithDiag(ctx, 'erDiagram')) {
+    apply(repairErThreeWord); // R7
+    apply(repairErSpaceKeys); // R8 (sur les lignes déjà passées par R7)
+    return current === null ? null : render(current);
+  }
   if (startsWithDiag(ctx, 'flowchart', 'graph')) {
     apply(repairFlowArrow); // R2
     const base = current ?? ctx.lines;
@@ -351,6 +419,6 @@ export function repairMermaidSource(source: string): string | null {
     apply(repairClassPipeTargets); // R6
     return current === null ? null : render(current);
   }
-  // Types non sondés (stateDiagram, erDiagram, pie, gantt…) : aucune règle validée.
+  // Types non sondés (stateDiagram, pie, gantt…) : aucune règle validée.
   return null;
 }
