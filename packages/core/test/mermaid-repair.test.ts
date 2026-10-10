@@ -424,8 +424,9 @@ const P027_ER_SCHEMA_WANTED = [
 ].join('\n');
 
 // Repro VERBATIM (extrait) de p-032 : clés séparées par ESPACES `PK FK` ;
-// la forme vérifiée rendue OK joint les clés par virgule collée au nom
-// (`property_idPK,FK`) — port FIDÈLE de rules.mjs R8 + suite proof-render.
+// la forme corrigée joint les clés par virgule EN GARDANT le nom de colonne
+// séparé (`property_id PK,FK`) — la forme collée `property_idPK,FK` rendait
+// mais affichait un nom de colonne faux dans le diagramme.
 const P032_ER_SPACEKEYS_SRC = [
   'erDiagram',
   'PROPERTIES {',
@@ -450,7 +451,7 @@ const P032_ER_SPACEKEYS_WANTED = [
   'string name',
   '}',
   'IRD_SETTINGS {',
-  'uuid property_idPK,FK',
+  'uuid property_id PK,FK',
   'boolean is_enabled',
   'boolean is_manual_offline',
   'text cover_image_url',

@@ -355,8 +355,9 @@ function repairErThreeWord(lines: string[]): string | null {
 /**
  * R8 — erDiagram : plusieurs clés de contrainte séparées par ESPACES
  * (`uuid property_id PK FK`) ; mermaid 12 exige des clés jointes par
- * virgules (`PK,FK`). Ne fire que quand les mots nus de fin sont tous
- * PK/FK/UK (2 à 3). Forme proof-renderée : `uuid property_idPK,FK`.
+ * virgules. Ne fire que quand les mots nus de fin sont tous
+ * PK/FK/UK (2 à 3). Forme rendue : `uuid property_id PK,FK` (le nom de
+ * colonne reste séparé des clés — sinon mermaid afficherait `property_idPK`).
  */
 function repairErSpaceKeys(lines: string[]): string | null {
   const re =
@@ -367,7 +368,7 @@ function repairErSpaceKeys(lines: string[]): string | null {
     if (!m) return line;
     const [, ind = '', t = '', n = '', keys = ''] = m;
     changed = true;
-    return `${ind}${t} ${n}${keys.trim().split(' ').join(',')}`;
+    return `${ind}${t} ${n} ${keys.trim().split(' ').join(',')}`;
   });
   return changed ? out.join('\n') : null;
 }
