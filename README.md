@@ -2,7 +2,7 @@
 
 **Qoder generates a beautiful Repo Wiki — then locks it inside the IDE. REPOWIKI TO PDF turns it into a single, vector, print-ready document your clients can actually receive.**
 
-![Release](https://img.shields.io/badge/release-v0.1.9-green)
+![Release](https://img.shields.io/badge/release-v0.1.10-green)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-0078d7)
 ![License](https://img.shields.io/badge/license-MIT-1d1d1f)
 ![UI languages](https://img.shields.io/badge/UI-EN%20%2F%20%E4%B8%AD%E6%96%87-7c6bf5)
@@ -68,7 +68,7 @@ npm run test:integration -w @repowiki-pdf/app # fixture → PDF structural asser
 npm run dist -w @repowiki-pdf/app            # electron-builder → release/ (NSIS + portable)
 ```
 
-> Installers are not published in the repo tree (GitHub file-size limits): grab `repowiki-to-pdf Setup 0.1.9.exe` / `repowiki-to-pdf Portable 0.1.9.exe` from the GitHub Releases page.
+> Installers are not published in the repo tree (GitHub file-size limits): grab `repowiki-to-pdf Setup 0.1.10.exe` / `repowiki-to-pdf Portable 0.1.10.exe` from the GitHub Releases page.
 
 ## How to use
 

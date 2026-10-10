@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file. The format
 follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.10] - 2026-10-10
+
+### Fixed
+
+- **Output folder on an existing directory (incl. drive roots like `D:\`) no longer fails with `EPERM`** — the app now creates the folder only when it is missing. Verified with a real export to a drive root.
+- **Installers can no longer ship a stale UI bundle** — `npm run dist` now always rebuilds the renderer and main process before packaging (the 0.1.9 installer shipped a pre-bump renderer, which is why Help → About showed v0.1.8).
+- Writing the PDF now fails with a clear message ("close the PDF if it is open in a reader, or pick another output folder") instead of a raw OS error.
+
 ## [0.1.9] - 2026-10-10
 
 ### Fixed
@@ -15,7 +23,7 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Mermaid repair engine: two new validated erDiagram rules (R7, R8) and a rename-boundary bug fix in rule R1 (it silently skipped identifiers immediately followed by an arrow, producing partial renames).
 
-## [0.1.8] - 2026-10-25
+## [0.1.8] - 2026-10-10
 
 ### Added
 

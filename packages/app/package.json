@@ -1,6 +1,6 @@
 {
   "name": "@repowiki-pdf/app",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "description": "Convert a Qoder RepoWiki into a single vector print-ready A4 PDF.",
   "author": "LinXells",
@@ -12,7 +12,7 @@
     "build:renderer": "vite build",
     "build": "npm run build:electron && npm run build:renderer",
     "start": "npm run build:electron && electron .",
-    "dist": "electron-builder --win --config electron-builder.yml",
+    "dist": "npm run build && electron-builder --win --config electron-builder.yml",
     "test:window": "npm run build && electron . --smoke-window",
     "test:integration": "npm run build:electron && electron integration/integration-run.mjs && node integration/assert.mjs"
   },

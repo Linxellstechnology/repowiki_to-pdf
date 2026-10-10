@@ -364,14 +364,29 @@ export async function runExport(
   const pageCount = polishedDoc.getPageCount();
 
   // h : écriture dans outputDir (défaut : racine du projet scanné).
+  // Windows lève EPERM sur mkdir('D:\', {recursive:true}) même quand la
+  // racine existe : on ne crée le dossier que s'il est absent.
   emit({ phase: 'write', label: 'Écriture du fichier PDF…' });
   const outDir = opts.outputDir ?? opts.projectRoot;
-  await fs.mkdir(outDir, { recursive: true });
+  const dirStat = await fs.stat(outDir).catch(() => null);
+  if (dirStat && !dirStat.isDirectory()) {
+    throw new Error(`Output folder is not a directory: ${outDir}`);
+  }
+  if (!dirStat) {
+    await fs.mkdir(outDir, { recursive: true });
+  }
   const outputPath = path.join(
     outDir,
     `${prepared.projectName}-Documentation.pdf`,
   );
-  await fs.writeFile(outputPath, polished);
+  try {
+    await fs.writeFile(outputPath, polished);
+  } catch (cause) {
+    const detail = cause instanceof Error ? cause.message : String(cause);
+    throw new Error(
+      `Cannot write ${outputPath} — ${detail}. Close the PDF if it is open in a reader, or pick another output folder.`,
+    );
+  }
 
   return { outputPath, pageCount, warnings };
 }
