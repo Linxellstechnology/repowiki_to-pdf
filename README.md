@@ -8,16 +8,12 @@
 ![UI languages](https://img.shields.io/badge/UI-EN%20%2F%20%E4%B8%AD%E6%96%87-7c6bf5)
 ![Downloads](https://img.shields.io/github/downloads/Linxellstechnology/repowiki_to-pdf/total)
 
-<!-- DEMO:GIF
-──────────────────────────────────────────────────────────────────────────────
-Demo slot. When the GIF is ready:
-  1. Record the full flow in the app — Load Wiki Folder → Check → Options →
-     Build PDF → Open The File (OBS Studio or Win+G; ~1280×800, under 10 MB).
-  2. Save it as assets/demo.gif and commit.
-  3. Replace the screenshot table below with:
-       ![REPOWIKI TO PDF — demo](assets/demo.gif)
-Until then the committed screenshots serve as the fallback demo.
-────────────────────────────────────────────────────────────────────────────── -->
+![REPOWIKI TO PDF — full flow demo](assets/screenshots/demo.gif)
+
+> 📹 The animation above is a **2×-speed capture of the real app** (~45 s):
+> Load Wiki Folder → Check → Options → live Preview → Build PDF → the finished
+> document opens in your PDF reader. For the unedited **1:30 walkthrough**,
+> open [`assets/screenshots/REPOWIKI2PDF.mp4`](assets/screenshots/REPOWIKI2PDF.mp4).
 
 <table>
   <tr>
